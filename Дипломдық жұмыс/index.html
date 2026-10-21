@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эссе бағалау жүйесі</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <ul>
+            <li><a href="#" id="nav-home">Басты бет</a></li>
+            <li><a href="#" id="nav-history">Тарих</a></li>
+            <li><a href="#" id="nav-about">Жоба туралы</a></li>
+        </ul>
+    </nav>
+    <header>
+        <div class="container">
+            <h1>Эссе бағалау жүйесі</h1>
+            <p>Қазақ тіліндегі эссенің құрылымы мен аргументациясын автоматты бағалауға арналған веб-қосымша</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Input Section -->
+        <section id="input-section" class="active-section">
+            <div class="card">
+                <h2>Эссе енгізу</h2>
+                <div class="form-group">
+                    <label for="essay-topic">Эссе тақырыбы</label>
+                    <input type="text" id="essay-topic" placeholder="Тақырыпты енгізіңіз..." required>
+                </div>
+                <div class="form-group">
+                    <label for="essay-text">Эссе мәтіні</label>
+                    <textarea id="essay-text" rows="12" placeholder="ортаға ығыссында ортада тұрсын" required></textarea>
+                    <div class="text-stats">
+                        <span id="word-count">Сөз саны: 0</span> | 
+                        <span id="char-count">Таңба саны: 0</span>
+                    </div>
+                </div>
+                <button id="analyze-btn" class="btn-primary">Талдауды бастау</button>
+            </div>
+        </section>
+
+        <!-- Loading Section -->
+        <section id="loading-section" class="hidden-section">
+            <div class="card text-center">
+                <div class="spinner"></div>
+                <h2>Эссе талданып жатыр...</h2>
+                <p>Құрылымы, аргументациясы және логикасы тексерілуде. Күте тұрыңыз.</p>
+            </div>
+        </section>
+
+        <!-- Result Section -->
+        <section id="result-section" class="hidden-section">
+            <div class="card">
+                <div class="result-header">
+                    <h2>Талдау нәтижесі</h2>
+                    <div class="total-score">
+                        <span class="score-value" id="total-score-value">0</span>
+                        <span class="score-max">/100</span>
+                    </div>
+                </div>
+
+                <div class="criteria-breakdown">
+                    <h3>Критерийлер бойынша баға</h3>
+                    <table class="criteria-table">
+                        <thead>
+                            <tr>
+                                <th>Критерий</th>
+                                <th>Баға</th>
+                                <th>Макс</th>
+                            </tr>
+                        </thead>
+                        <tbody id="criteria-body">
+                            <!-- Filled by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="feedback-section">
+                    <h3>Кері байланыс</h3>
+                    <div class="feedback-grid">
+                        <div class="feedback-box strengths">
+                            <h4>✅ Күшті жақтары</h4>
+                            <ul id="strengths-list"></ul>
+                        </div>
+                        <div class="feedback-box weaknesses">
+                            <h4>⚠️ Әлсіз жақтары</h4>
+                            <ul id="weaknesses-list"></ul>
+                        </div>
+                        <div class="feedback-box recommendations">
+                            <h4>💡 Ұсыныстар</h4>
+                            <ul id="recommendations-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visual-analysis">
+                    <h3>Визуалды талдау</h3>
+                    <p class="analysis-legend">
+                        <span class="marker-thesis">Тезис</span>
+                        <span class="marker-argument">Аргумент</span>
+                        <span class="marker-evidence">Дәлел/Мысал</span>
+                    </p>
+                    <div id="annotated-text" class="annotated-box"></div>
+                </div>
+
+                <button id="download-pdf" class="btn-secondary">PDF-ке сақтау</button>
+                <button id="view-history" class="btn-secondary">Тарихқа өту</button>
+                <button id="reset-btn" class="btn-secondary">Жаңа эссе енгізу</button>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section id="history-section" class="hidden-section">
+            <div class="card">
+                <h2>Талдау тарихы</h2>
+                <div id="history-cards" class="history-cards"><ul id="history-list"></ul></div>
+                <button id="back-to-input" class="btn-primary">Басты бетке қайту</button>
+            </div>
+        </section>
+            <!-- About Section -->
+        <section id="about-section" class="hidden-section">
+            <div class="card">
+                <h2>Жоба туралы</h2>
+                <p>Бұл веб-қосымша қазақ тіліндегі эссе құрылымы, аргументациясы, логикасы және тілдік сапасын автоматты түрде бағалайды. PDF экспорттау, талдау тарихын сақтау және визуалды аннотация сияқты мүмкіндіктерді қамтиды.</p>
+                <button id="back-from-about" class="btn-primary">Басты бетке қайту</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Қазақ тіліндегі эссе бағалау жүйесі. Барлық құқықтар қорғалған.</p>
+            <p><a href="https://github.com/your-repo" target="_blank">GitHub репозиторий</a></p>
+        </div>
+    </footer>
+
+    <!-- jsPDF CDN for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
