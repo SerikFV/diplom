@@ -30,17 +30,30 @@
                 <h2>Эссе енгізу</h2>
                 <div class="form-group">
                     <label for="essay-topic">Эссе тақырыбы</label>
-                    <input type="text" id="essay-topic" placeholder="Тақырыпты енгізіңіз..." required>
+                    <input type="text" id="essay-topic" placeholder="Тақырыпты енгізіңіз..." maxlength="500" required>
                 </div>
                 <div class="form-group">
                     <label for="essay-text">Эссе мәтіні</label>
-                    <textarea id="essay-text" rows="12" placeholder="ортаға ығыссында ортада тұрсын" required></textarea>
+                    <textarea id="essay-text" rows="12" placeholder="Эссе мәтінін енгізіңіз…" maxlength="20000" required></textarea>
                     <div class="text-stats">
                         <span id="word-count">Сөз саны: 0</span> | 
                         <span id="char-count">Таңба саны: 0</span>
                     </div>
                 </div>
-                <button id="analyze-btn" class="btn-primary">Талдауды бастау</button>
+                <div class="analysis-settings">
+                    <label>Эссе түрі<select id="essay-type">
+                        <option value="argumentative">Пікірталастық</option><option value="analytical">Талдамалық</option>
+                        <option value="expository">Түсіндірмелік</option><option value="comparative">Салыстырмалы</option>
+                        <option value="reflective">Рефлексивтік</option></select></label>
+                    <label>Стиль<select id="essay-style"><option value="scientific">Ғылыми</option>
+                        <option value="publicistic">Публицистикалық</option><option value="literary">Көркем</option></select></label>
+                    <label>Көлем<select id="essay-length"><option value="academic">Академиялық: 120–150 сөз</option>
+                        <option value="short">Шағын: 80–100 сөз</option><option value="full">Толық: 200–250 сөз</option></select></label>
+                    <label>Аудитория<input id="essay-audience" type="text" value="Білім алушылар" maxlength="200"></label>
+                </div>
+                <p class="privacy-note">Талдау үшін тақырып пен мәтін Google Gemini қызметіне жіберіледі. Жеке немесе құпия мәлімет енгізбеңіз. Тарих осы браузерде сақталады.</p>
+                <p id="analysis-error" role="alert" hidden></p>
+                <button id="analyze-btn" class="btn-primary">AI арқылы талдау</button>
             </div>
         </section>
 
@@ -64,6 +77,7 @@
                     </div>
                 </div>
 
+                <p id="analysis-summary"></p><p id="topic-relevance"></p><p id="length-result"></p>
                 <div class="criteria-breakdown">
                     <h3>Критерийлер бойынша баға</h3>
                     <table class="criteria-table">
@@ -71,7 +85,7 @@
                             <tr>
                                 <th>Критерий</th>
                                 <th>Баға</th>
-                                <th>Макс</th>
+                                <th>Макс</th><th>Түсіндірме</th>
                             </tr>
                         </thead>
                         <tbody id="criteria-body">
@@ -99,16 +113,19 @@
                 </div>
 
                 <div class="visual-analysis">
-                    <h3>Визуалды талдау</h3>
+                    <h3>Мәтінге байланысты ескертулер</h3>
                     <p class="analysis-legend">
                         <span class="marker-thesis">Тезис</span>
                         <span class="marker-argument">Аргумент</span>
                         <span class="marker-evidence">Дәлел/Мысал</span>
                     </p>
                     <div id="annotated-text" class="annotated-box"></div>
+                    <h3>AI түсіндірмелері</h3><div id="annotations-list"></div>
+                    <h3>Қосымша бақылаулар</h3><ul id="additional-observations"></ul>
+                    <ul id="analysis-limitations"></ul>
                 </div>
 
-                <button id="download-pdf" class="btn-secondary">PDF-ке сақтау</button>
+                <button id="download-pdf" class="btn-secondary">Басып шығару / PDF</button>
                 <button id="view-history" class="btn-secondary">Тарихқа өту</button>
                 <button id="reset-btn" class="btn-secondary">Жаңа эссе енгізу</button>
             </div>
@@ -126,7 +143,7 @@
         <section id="about-section" class="hidden-section">
             <div class="card">
                 <h2>Жоба туралы</h2>
-                <p>Бұл веб-қосымша қазақ тіліндегі эссе құрылымы, аргументациясы, логикасы және тілдік сапасын автоматты түрде бағалайды. PDF экспорттау, талдау тарихын сақтау және визуалды аннотация сияқты мүмкіндіктерді қамтиды.</p>
+                <p>Ортақ эссе жазу ережелеріне сүйеніп, AI құрылымды, аргументацияны, логиканы, дәлелдерді және тілді бағалайды. Маркерлер қосымша белгі ретінде көрсетіледі. Баға — ұсыныс; факт дұрыстығы мен плагиат тексерілмейді.</p>
                 <button id="back-from-about" class="btn-primary">Басты бетке қайту</button>
             </div>
         </section>
@@ -136,12 +153,10 @@
     <footer>
         <div class="container">
             <p>&copy; 2026 Қазақ тіліндегі эссе бағалау жүйесі. Барлық құқықтар қорғалған.</p>
-            <p><a href="https://github.com/your-repo" target="_blank">GitHub репозиторий</a></p>
+            <p><a href="https://github.com/SerikFV/diplom" target="_blank">GitHub репозиторий</a></p>
         </div>
     </footer>
 
-    <!-- jsPDF CDN for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
