@@ -101,12 +101,31 @@ def call_ai(payload):
         content = ''.join(part.get('text', '') for part in choice['content']['parts'] if not part.get('thought'))
         return AIAnalysis.model_validate_json(content)
     except HTTPError as error:
-        messages = {401: 'AI кілті жарамсыз немесе қолжетімділік жоқ.',
+        # Google returns 400 (not always 401) for an invalid API key.
+        # Inspect only known reason codes; never expose raw provider text or keys.
+        reasons = set()
+        try:
+            diagnostic = json.load(error).get('error', {})
+            if isinstance(diagnostic, dict):
+                for detail in diagnostic.get('details', []):
+                    if isinstance(detail, dict):
+                        reasons.add(detail.get('reason'))
+        except (ValueError, TypeError, AttributeError, OSError):
+            pass
+        messages = {400: 'Gemini сұраныс параметрлерін қабылдамады. Модель мен API баптауларын тексеріңіз.',
+                    401: 'AI кілті жарамсыз немесе қолжетімділік жоқ.',
                     503: 'Gemini қызметіне қазір жүктеме жоғары. Сәл кейін қайта тексеріңіз.',
                     404: 'Таңдалған Gemini моделі қолжетімсіз. Сервердегі модель баптауын тексеріңіз.',
                     403: 'AI қызметіне желі не рұқсат шектеуі қойылған.',
                     429: 'AI қызметінің сұраныс не төлем лимиті аяқталды. Кейін қайталаңыз.'}
-        raise HTTPException(502, messages.get(error.code, 'AI қызметі сұранысты өңдей алмады. Сервер баптауын тексеріңіз.')) from None
+        message = messages.get(error.code, 'AI қызметі сұранысты өңдей алмады.')
+        if 'API_KEY_INVALID' in reasons:
+            message = 'Gemini API кілті жарамсыз. Google AI Studio кілтін енгізгеніңізді тексеріп, серверді қайта іске қосыңыз.'
+        elif reasons & {'API_KEY_SERVICE_BLOCKED', 'API_KEY_HTTP_REFERRER_BLOCKED', 'API_KEY_IP_ADDRESS_BLOCKED', 'API_KEY_API_TARGET_BLOCKED'}:
+            message = 'Gemini кілтінің қолдану шектеуі осы серверге рұқсат бермейді. Google Cloud кілт баптауларын тексеріңіз.'
+        elif 'SERVICE_DISABLED' in reasons:
+            message = 'Жобада Gemini API өшірілген. Google AI Studio жобасын тексеріңіз.'
+        raise HTTPException(502, f'{message} (Gemini HTTP {error.code})') from None
     except (URLError, TimeoutError, OSError):
         raise HTTPException(504, 'AI қызметімен байланыс орнамады немесе күту уақыты аяқталды.') from None
     except (ValueError, KeyError, IndexError, TypeError, ValidationError):

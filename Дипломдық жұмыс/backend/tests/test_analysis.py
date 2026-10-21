@@ -82,6 +82,16 @@ class AnalysisTests(unittest.TestCase):
             self.assertNotIn('secret-body', response.text)
             self.assertNotIn('test-placeholder', response.text)
 
+    def test_google_invalid_key_400_is_explained_without_raw_body(self):
+        error_body = {'error': {'message': 'secret-provider-text', 'details': [{'reason': 'API_KEY_INVALID'}]}}
+        failure = HTTPError('https://generativelanguage.googleapis.com', 400, 'Bad Request', {}, io.BytesIO(json.dumps(error_body).encode()))
+        with patch.dict(os.environ, {'ESSAY_AI_API_KEY': 'test-placeholder'}), patch.object(main, 'urlopen', side_effect=failure):
+            response = self.client.post('/api/analyze', json={'topic': 'Білім', 'text': TEXT})
+        self.assertEqual(response.status_code, 502)
+        self.assertIn('кілтi'.replace('i', 'і'), response.json()['detail'])
+        self.assertIn('HTTP 400', response.json()['detail'])
+        self.assertNotIn('secret-provider-text', response.text)
+
     def test_incomplete_or_malformed_response_rejected(self):
         for body in [{'choices': []}, {'choices': [{'finish_reason': 'length', 'message': {'content': '{}'}}]}, {'choices': [{'finish_reason': 'stop', 'message': {'content': '{}'}}]}]:
             with patch.dict(os.environ, {'ESSAY_AI_API_KEY': 'test-placeholder'}), patch.object(main, 'urlopen', return_value=io.BytesIO(json.dumps(body).encode())):
